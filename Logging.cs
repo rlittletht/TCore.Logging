@@ -56,6 +56,11 @@ namespace TCore.Logging
             m_guidCorrelation = Guid.NewGuid();
         }
 
+        public static implicit operator Guid(CorrelationID crid)
+        {
+            return crid.Crids;
+        }
+
         public CorrelationID(CorrelationID cridParent)
         {
             m_guidCorrelation = Guid.NewGuid();
@@ -116,6 +121,11 @@ namespace TCore.Logging
                 m_ts.TraceInformation("test");
             m_ts.TraceEvent(TraceEventType.Information, 12345, "test{0}", "foo");
 #endif
+//            System.Diagnostics.Trace.TraceInformation("ListenersCount: {0}", Trace.Listeners.Count);
+            for (int i = 0; i < Trace.Listeners.Count; i++)
+                {
+                m_ts.Listeners.Add(System.Diagnostics.Trace.Listeners[i]);
+                }
             m_sFile = sFile;
         }
 
@@ -126,7 +136,9 @@ namespace TCore.Logging
             if (ts.Switch.ShouldTrace((TraceEventType) et))
                 {
                 string sFormatted = String.Format(s, rgo);
-                ts.TraceEvent((TraceEventType)et, crid?.Hash2 ?? 0, "{0}\t{1}\t{2:X8}\t{3}\t{4}", crid?.Text ?? _sGuidZero, System.Threading.Thread.CurrentThread.ManagedThreadId, nTicks, dttm, sFormatted);
+                ts.TraceEvent((TraceEventType) et, crid?.Hash2 ?? 0, "{0}\t{1}\t{2:X8}\t{3}\t{4}",
+                    crid?.Text ?? _sGuidZero, System.Threading.Thread.CurrentThread.ManagedThreadId, nTicks, dttm,
+                    sFormatted);
                 }
         }
 
@@ -158,6 +170,19 @@ namespace TCore.Logging
             ts.Close();
         }
 
+
+        public bool FShouldLog(EventType et)
+        {
+            return m_ts.Switch.ShouldTrace((TraceEventType)et);
+        }
+
+        /* L O G  E V E N T */
+        /*----------------------------------------------------------------------------
+        	%%Function: LogEvent
+        	%%Qualified: TCore.Logging.LogProvider.LogEvent
+        	%%Contact: rlittle
+        	
+        ----------------------------------------------------------------------------*/
         public void LogEvent(CorrelationID crid, EventType et, string s, params object[] rgo)
         {
             if (!m_ts.Switch.ShouldTrace((TraceEventType) et))
@@ -178,6 +203,18 @@ namespace TCore.Logging
         public void LogSz(CorrelationID crid, string s, params object[] rgo)
         {
             LogEvent(crid, EventType.Information, s, rgo);
+        }
+
+        /* L O G  V E R B O S E  S Z */
+        /*----------------------------------------------------------------------------
+        	%%Function: LogVerboseSz
+        	%%Qualified: TCore.Logging.LogProvider.LogVerboseSz
+        	%%Contact: rlittle
+        	
+        ----------------------------------------------------------------------------*/
+        public void LogVerboseSz(CorrelationID crid, string s, params object[] rgo)
+        {
+            LogEvent(crid, EventType.Verbose, s, rgo);
         }
 
     }
