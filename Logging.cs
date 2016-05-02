@@ -14,8 +14,6 @@ namespace TCore.Logging
         public CustomListener(string sFilename) : base(sFilename)
         {
         }
-
-
     }
 
     public class CorrelationID // crid
