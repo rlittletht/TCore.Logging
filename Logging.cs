@@ -5,16 +5,23 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+#if !WINDOWS_UWP
 using System.Diagnostics;
+#else
+using Windows.Foundation.Diagnostics;
+using Windows.Storage;
+#endif
 
 namespace TCore.Logging
 {
+#if !WINDOWS_UWP
     public class CustomListener : TextWriterTraceListener
     {
         public CustomListener(string sFilename) : base(sFilename)
         {
         }
     }
+#endif
 
     public class CorrelationID // crid
     {
@@ -84,17 +91,30 @@ namespace TCore.Logging
 
     public enum EventType
     {
+#if WINDOWS_UWP
+        Critical = LoggingLevel.Critical,
+        Error = LoggingLevel.Error,
+        Warning = LoggingLevel.Warning,
+        Information = LoggingLevel.Information,
+        Verbose = LoggingLevel.Verbose
+#else
         Critical = TraceEventType.Critical,
         Error = TraceEventType.Error,
         Warning = TraceEventType.Warning,
         Information = TraceEventType.Information,
         Verbose = TraceEventType.Verbose
+#endif
     };
 
     public class LogProvider
     {
         private string m_sFile;
+#if WINDOWS_UWP
+        private LoggingChannel m_ts;
+        private LoggingSession m_ls;
+#else
         private TraceSource m_ts;
+#endif
 
         public void test(string s, params object[] rgo)
         {
@@ -105,6 +125,14 @@ namespace TCore.Logging
 
         public LogProvider(string sFile)
         {
+#if WINDOWS_UWP
+            m_ls = new LoggingSession(sFile);
+            LoggingChannelOptions lco = new LoggingChannelOptions();
+            
+            m_ts = new LoggingChannel(sFile, lco);
+
+            m_ls.AddLoggingChannel(m_ts);
+#else
             m_ts = new TraceSource(sFile);
 #if TESTPROVIDER
             string s = String.Format("foo{0}{1}", "1", 2);
@@ -124,11 +152,39 @@ namespace TCore.Logging
                 {
                 m_ts.Listeners.Add(System.Diagnostics.Trace.Listeners[i]);
                 }
+#endif
             m_sFile = sFile;
         }
 
         private const string _sGuidZero = "00000000-0000-0000-0000-000000000000";
 
+#if WINDOWS_UWP
+        private static void LogInternal(LoggingChannel ts, CorrelationID crid, EventType et, int nTicks, DateTime dttm, string s, params object[] rgo)
+        {
+            string sFormatted = String.Format(s, rgo);
+            string sStringField = String.Format("{0}\t{1}\t{2:X8}\t{3}\t{4}",
+                                                crid?.Text ?? _sGuidZero, -1, nTicks, dttm,
+                                                sFormatted);
+
+            LoggingFields lf = new LoggingFields();
+            lf.AddString("sParm", sStringField);
+            lf.AddInt16("Hash2", crid?.Hash2 ?? 0);
+            string sType;
+
+            if (et == EventType.Critical)
+                sType = "Critical";
+            else if (et == EventType.Error)
+                sType = "Error";
+            else if (et == EventType.Information)
+                sType = "Information";
+            else if (et == EventType.Warning)
+                sType = "Warning";
+            else
+                sType = "Verbose";
+
+            ts.LogEvent(sType, lf, (LoggingLevel) et);
+        }
+#else
         private static void LogInternal(TraceSource ts, CorrelationID crid, EventType et, int nTicks, DateTime dttm, string s, params object[] rgo)
         {
             if (ts.Switch.ShouldTrace((TraceEventType) et))
@@ -168,11 +224,18 @@ namespace TCore.Logging
             ts.Close();
         }
 
-
         public bool FShouldLog(EventType et)
         {
             return m_ts.Switch.ShouldTrace((TraceEventType)et);
         }
+#endif
+
+#if WINDOWS_UWP
+        public bool FShouldLog(EventType et)
+        {
+            return true;
+        }
+#endif
 
         /* L O G  E V E N T */
         /*----------------------------------------------------------------------------
@@ -183,7 +246,7 @@ namespace TCore.Logging
         ----------------------------------------------------------------------------*/
         public void LogEvent(CorrelationID crid, EventType et, string s, params object[] rgo)
         {
-            if (!m_ts.Switch.ShouldTrace((TraceEventType) et))
+            if (!FShouldLog(et))
                 return;
 
             int nTicks = Environment.TickCount;
@@ -215,6 +278,12 @@ namespace TCore.Logging
             LogEvent(crid, EventType.Verbose, s, rgo);
         }
 
+#if WINDOWS_UWP
+        public void Flush()
+        {
+            m_ls.SaveToFileAsync(ApplicationData.Current.LocalFolder, m_sFile).AsTask().Wait();
+        }
+#endif
     }
     public class LogProviderFile
     {
@@ -248,9 +317,19 @@ namespace TCore.Logging
         ----------------------------------------------------------------------------*/
         static public void LogSzUnsafe(DateTime dttm, int nTicks, string s, string sFile)
         {
+#if WINDOWS_UWP
+            using (Stream stm = new FileStream(sFile, FileMode.Append))
+                using (StreamWriter sw = new StreamWriter(stm, System.Text.Encoding.UTF8))
+                {
+                sw.Write(String.Format("[{0:X8}:{1}]: {2}\n", nTicks, dttm, s));
+                sw.Flush();
+                }
+#else
             StreamWriter sw = new StreamWriter(sFile, true /*fAppend*/, System.Text.Encoding.Default);
+
             sw.Write(String.Format("[{0:X8}:{1}]: {2}\n", nTicks, dttm, s));
             sw.Close();
+#endif
         }
         /* L O G  S Z */
         /*----------------------------------------------------------------------------
