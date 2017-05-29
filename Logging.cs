@@ -1,13 +1,21 @@
-﻿using System;
+﻿// ============================================================================
+// Generic logging facilities
+//
+// Usage:
+// 
+// ============================================================================
+using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 #if !WINDOWS_UWP
 using System.Diagnostics;
 #else
+
 using Windows.Foundation.Diagnostics;
 using Windows.Storage;
 #endif
@@ -23,6 +31,9 @@ namespace TCore.Logging
     }
 #endif
 
+    // ============================================================================
+    // C O R R E L A T I O N  I  D
+    // ============================================================================
     public class CorrelationID // crid
     {
         private Guid m_guidCorrelation;
@@ -106,7 +117,12 @@ namespace TCore.Logging
 #endif
     };
 
-    public class LogProvider
+    public interface ILogProvider
+    {
+        void LogEvent(CorrelationID crid, EventType et, string s, params object[] rgo);
+    }
+
+    public class LogProvider : ILogProvider
     {
         private string m_sFile;
 #if WINDOWS_UWP
@@ -162,12 +178,12 @@ namespace TCore.Logging
         private static void LogInternal(LoggingChannel ts, CorrelationID crid, EventType et, int nTicks, DateTime dttm, string s, params object[] rgo)
         {
             string sFormatted = String.Format(s, rgo);
-            string sStringField = String.Format("{0}\t{1}\t{2:X8}\t{3}\t{4}",
-                                                crid?.Text ?? _sGuidZero, -1, nTicks, dttm,
-                                                sFormatted);
 
             LoggingFields lf = new LoggingFields();
-            lf.AddString("sParm", sStringField);
+            lf.AddString("CorrelationID", crid?.Text ?? _sGuidZero);
+            lf.AddString("nTicks", nTicks.ToString());
+            lf.AddString("timestamp", dttm.ToString());
+            lf.AddString("sParm", sFormatted);
             lf.AddInt16("Hash2", crid?.Hash2 ?? 0);
             string sType;
 
@@ -338,7 +354,7 @@ namespace TCore.Logging
         	%%Contact: rlittle
 
         ----------------------------------------------------------------------------*/
-        public void LogSz(CorrelationID crid, string s)
+        public void LogSz(CorrelationID crid, string s, params object[] rgo)
         {
             int l = Environment.TickCount;
 
@@ -346,7 +362,7 @@ namespace TCore.Logging
 
             lock (m_oLogLock)
                 {
-                LogSzUnsafe(dttm, l, String.Format("{0}: {1}", crid?.Text, s), m_sFile);
+                LogSzUnsafe(dttm, l, String.Format("{0}: {1}", crid?.Text, String.Format(s, rgo)), m_sFile);
                 }
         }
 
