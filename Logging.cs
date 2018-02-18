@@ -301,7 +301,7 @@ namespace TCore.Logging
         }
 #endif
     }
-    public class LogProviderFile
+    public class LogProviderFile : ILogProvider
     {
         private string m_sFile;
 
@@ -311,6 +311,37 @@ namespace TCore.Logging
         }
 
         private Object m_oLogLock = new Object();
+
+        public bool FShouldLog(EventType et)
+        {
+            return true;
+        }
+
+        private const string _sGuidZero = "00000000-0000-0000-0000-000000000000";
+
+        private void LogInternal(CorrelationID crid, EventType et, int nTicks, DateTime dttm, string s, params object[] rgo)
+        {
+            string sFormatted = String.Format(s, rgo);
+            string sOutline = String.Format("{0}\t{1}\t{2:X8}\t{3}\t{4}",
+                                            crid?.Text ?? _sGuidZero, System.Threading.Thread.CurrentThread.ManagedThreadId, nTicks, dttm,
+                                            sFormatted);
+
+            lock (m_oLogLock)
+                {
+                LogSzUnsafeDirect(sOutline, m_sFile);
+                }
+        }
+
+        public void LogEvent(CorrelationID crid, EventType et, string s, params object[] rgo)
+        {
+            if (!FShouldLog(et))
+                return;
+
+            int nTicks = Environment.TickCount;
+            DateTime dttm = DateTime.Now;
+            LogInternal(crid, et, nTicks, dttm, s, rgo);
+        }
+
 
         /* L O G  S Z  U N S A F E */
         /*----------------------------------------------------------------------------
@@ -331,22 +362,29 @@ namespace TCore.Logging
         	%%Contact: rlittle
         	
         ----------------------------------------------------------------------------*/
-        static public void LogSzUnsafe(DateTime dttm, int nTicks, string s, string sFile)
+        static public void LogSzUnsafeDirect(string s, string sFile)
         {
 #if WINDOWS_UWP
             using (Stream stm = new FileStream(sFile, FileMode.Append))
                 using (StreamWriter sw = new StreamWriter(stm, System.Text.Encoding.UTF8))
                 {
-                sw.Write(String.Format("[{0:X8}:{1}]: {2}\n", nTicks, dttm, s));
+                sw.Write(s);
                 sw.Flush();
                 }
 #else
             StreamWriter sw = new StreamWriter(sFile, true /*fAppend*/, System.Text.Encoding.Default);
 
-            sw.Write(String.Format("[{0:X8}:{1}]: {2}\n", nTicks, dttm, s));
+            sw.Write(String.Format(s));
             sw.Close();
 #endif
         }
+
+        static public void LogSzUnsafe(DateTime dttm, int nTicks, string s, string sFile)
+        {
+            string sOutLine = String.Format("[{0:X8}:{1}]: {2}\n", nTicks, dttm, s);
+            LogSzUnsafeDirect(sOutLine, sFile);
+        }
+
         /* L O G  S Z */
         /*----------------------------------------------------------------------------
         	%%Function: LogSz
