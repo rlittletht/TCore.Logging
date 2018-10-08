@@ -64,12 +64,6 @@
   <ItemGroup>
     <None Include="README.md" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\TCore.Util\TCore.Util.csproj">
-      <Project>{59868345-bc40-4771-a4d7-7c6a763663f0}</Project>
-      <Name>TCore.Util</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

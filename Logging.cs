@@ -149,7 +149,10 @@ namespace TCore.Logging
 
             m_ls.AddLoggingChannel(m_ts);
 #else
+            if (sFile == null)
+                return;
             m_ts = new TraceSource(sFile);
+
 #if TESTPROVIDER
             string s = String.Format("foo{0}{1}", "1", 2);
             test("foo{0}{1}", "1", 2);
@@ -242,6 +245,9 @@ namespace TCore.Logging
 
         public bool FShouldLog(EventType et)
         {
+            if (m_ts == null)
+                return false;
+
             return m_ts.Switch.ShouldTrace((TraceEventType)et);
         }
 #endif
@@ -310,10 +316,21 @@ namespace TCore.Logging
             m_sFile = sFile;
         }
 
+        private int m_nLogLevel = 3;
+
         private Object m_oLogLock = new Object();
 
         public bool FShouldLog(EventType et)
         {
+            if (et == EventType.Verbose && m_nLogLevel < 4)
+                return false;
+
+            if (et == EventType.Information && m_nLogLevel < 3)
+                return false;
+
+            if (et == EventType.Warning && m_nLogLevel < 2)
+                return false;
+
             return true;
         }
 
@@ -322,10 +339,15 @@ namespace TCore.Logging
         private void LogInternal(CorrelationID crid, EventType et, int nTicks, DateTime dttm, string s, params object[] rgo)
         {
             string sFormatted = String.Format(s, rgo);
+#if WINDOWS_UWP
+            string sOutline = String.Format("{0}\t{1}\t{2:X8}\t{3}\t{4}",
+                                            crid?.Text ?? _sGuidZero, 0, nTicks, dttm,
+                                            sFormatted);
+#else
             string sOutline = String.Format("{0}\t{1}\t{2:X8}\t{3}\t{4}",
                                             crid?.Text ?? _sGuidZero, System.Threading.Thread.CurrentThread.ManagedThreadId, nTicks, dttm,
                                             sFormatted);
-
+#endif
             lock (m_oLogLock)
                 {
                 LogSzUnsafeDirect(sOutline, m_sFile);
@@ -368,13 +390,13 @@ namespace TCore.Logging
             using (Stream stm = new FileStream(sFile, FileMode.Append))
                 using (StreamWriter sw = new StreamWriter(stm, System.Text.Encoding.UTF8))
                 {
-                sw.Write(s);
+                sw.WriteLine(s);
                 sw.Flush();
                 }
 #else
             StreamWriter sw = new StreamWriter(sFile, true /*fAppend*/, System.Text.Encoding.Default);
 
-            sw.Write(String.Format(s));
+            sw.WriteLine(String.Format(s));
             sw.Close();
 #endif
         }
