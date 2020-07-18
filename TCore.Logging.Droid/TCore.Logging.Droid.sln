@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TCore.Logging.Droid", "TCore.Logging.Droid.csproj", "{71C0F0ED-042E-4E8E-9776-C48C6F99FED9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		AzureRelease|Any CPU = AzureRelease|Any CPU
+		Debug|Any CPU = Debug|Any CPU
+		LocalDebug|Any CPU = LocalDebug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{71C0F0ED-042E-4E8E-9776-C48C6F99FED9}.AzureRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{71C0F0ED-042E-4E8E-9776-C48C6F99FED9}.AzureRelease|Any CPU.Build.0 = Release|Any CPU
+		{71C0F0ED-042E-4E8E-9776-C48C6F99FED9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71C0F0ED-042E-4E8E-9776-C48C6F99FED9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{71C0F0ED-042E-4E8E-9776-C48C6F99FED9}.LocalDebug|Any CPU.ActiveCfg = Debug|Any CPU
+		{71C0F0ED-042E-4E8E-9776-C48C6F99FED9}.LocalDebug|Any CPU.Build.0 = Debug|Any CPU
+		{71C0F0ED-042E-4E8E-9776-C48C6F99FED9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{71C0F0ED-042E-4E8E-9776-C48C6F99FED9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {79B1C210-9038-4A66-AA34-F21D6D736B2A}
+	EndGlobalSection
+EndGlobal
