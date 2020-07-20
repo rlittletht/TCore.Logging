@@ -7,8 +7,8 @@
     <ProjectGuid>{8CC42025-D8E2-4254-ACAF-4CAA05C1EF7F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TCore.Logging_Universal_</RootNamespace>
-    <AssemblyName>TCore.Logging%28Universal%29</AssemblyName>
+    <RootNamespace>TCore.Logging</RootNamespace>
+    <AssemblyName>TCore.Logging</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
     <TargetPlatformVersion>10.0.14393.0</TargetPlatformVersion>
