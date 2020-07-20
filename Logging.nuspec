@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>TCore.Logging</id>
+    <version>1.4.0.0</version>
+    <title>TCore.Logging</title>
+    <authors>Robert Little</authors>
+    <owners>Robert Little</owners>
+    <licenseUrl>https://github.com/rlittletht/TCore.Logging/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/rlittletht/TCore.Logging</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Basic Logging abstraction</description>
+    <releaseNotes>Initial nuget package release</releaseNotes>
+    <copyright>Copyright 2020</copyright>
+    <tags>Logging</tags>
+	<dependencies>
+		<group targetFramework="net462"/>
+		<group targetFramework="MonoAndroid"/>
+		<group targetFramework="uap"/>
+	</dependencies>
+  </metadata>
+  <files>
+	  <!-- Cross-platform reference assemblies -->
+
+	  <!-- Android reference assemblies -->
+	  <file src="TCore.Logging.Droid\bin\Release\TCore.Logging.dll" target="lib\MonoAndroid\TCore.Logging.dll" />
+
+	  <!-- Net reference assemblies -->
+	  <file src="bin\Release\TCore.Logging.dll" target="lib\Net462\TCore.Logging.dll" />
+
+	  <!-- UWP  -->
+	  <file src="TCore.Logging(Universal)\bin\Release\TCore.Logging.dll" target="lib\uap10\TCore.Logging.dll" />
+  </files>
+</package>
