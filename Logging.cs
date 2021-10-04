@@ -344,9 +344,8 @@ namespace TCore.Logging
                                             crid?.Text ?? _sGuidZero, 0, nTicks, dttm,
                                             sFormatted);
 #else
-            string sOutline = String.Format("{0}\t{1}\t{2:X8}\t{3}\t{4}",
-                                            crid?.Text ?? _sGuidZero, System.Threading.Thread.CurrentThread.ManagedThreadId, nTicks, dttm,
-                                            sFormatted);
+            string sOutline =
+	            $"{crid?.Text ?? _sGuidZero}\t{System.Threading.Thread.CurrentThread.ManagedThreadId}\t{nTicks:X8}\t{dttm}\t{sFormatted}";
 #endif
             lock (m_oLogLock)
                 {
@@ -403,7 +402,7 @@ namespace TCore.Logging
 
         static public void LogSzUnsafe(DateTime dttm, int nTicks, string s, string sFile)
         {
-            string sOutLine = String.Format("[{0:X8}:{1}]: {2}\n", nTicks, dttm, s);
+            string sOutLine = $"[{nTicks:X8}:{dttm}]: {s}\n";
             LogSzUnsafeDirect(sOutLine, sFile);
         }
 
@@ -422,7 +421,7 @@ namespace TCore.Logging
 
             lock (m_oLogLock)
                 {
-                LogSzUnsafe(dttm, l, String.Format("{0}: {1}", crid?.Text, String.Format(s, rgo)), m_sFile);
+                LogSzUnsafe(dttm, l, $"{crid?.Text}: {String.Format(s, rgo)}", m_sFile);
                 }
         }
 
