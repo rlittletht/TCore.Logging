@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>TCore.Logging</id>
-    <version>1.4.0.0</version>
+    <version>1.5.1.0</version>
     <title>TCore.Logging</title>
     <authors>Robert Little</authors>
     <owners>Robert Little</owners>
@@ -15,6 +15,10 @@
     <tags>Logging</tags>
 	<dependencies>
 		<group targetFramework="net462"/>
+		<group targetFramework="net472"/>
+		<group targetFramework="net48"/>
+		<group targetFramework="net7.0"/>
+		<group targetFramework="net8.0"/>
 		<group targetFramework="MonoAndroid"/>
 		<group targetFramework="uap"/>
 	</dependencies>
@@ -26,7 +30,11 @@
 	  <file src="TCore.Logging.Droid\bin\Release\TCore.Logging.dll" target="lib\MonoAndroid\TCore.Logging.dll" />
 
 	  <!-- Net reference assemblies -->
-	  <file src="bin\Release\TCore.Logging.dll" target="lib\Net462\TCore.Logging.dll" />
+	  <file src="TCore.Logging\bin\Release\net462\Logging.dll" target="lib\Net462\Logging.dll" />
+    <file src="TCore.Logging\bin\Release\net472\Logging.dll" target="lib\Net472\Logging.dll" />
+    <file src="TCore.Logging\bin\Release\net48\Logging.dll" target="lib\Net48\Logging.dll" />
+    <file src="TCore.Logging\bin\Release\net7.0\Logging.dll" target="lib\Net7.0\Logging.dll" />
+    <file src="TCore.Logging\bin\Release\net8.0\Logging.dll" target="lib\Net8.0\Logging.dll" />
 
 	  <!-- UWP  -->
 	  <file src="TCore.Logging(Universal)\bin\Release\TCore.Logging.dll" target="lib\uap10\TCore.Logging.dll" />

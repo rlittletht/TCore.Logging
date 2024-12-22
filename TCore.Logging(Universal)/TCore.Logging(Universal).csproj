@@ -104,7 +104,7 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\Logging.cs">
+    <Compile Include="..\TCore.Logging\Logging.cs">
       <Link>Logging.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />

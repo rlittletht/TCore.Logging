@@ -47,7 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Logging.cs">
+    <Compile Include="..\TCore.Logging\Logging.cs">
       <Link>Logging.cs</Link>
     </Compile>
     <Compile Include="Resources\Resource.designer.cs" />
